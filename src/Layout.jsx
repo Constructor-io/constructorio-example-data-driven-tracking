@@ -38,6 +38,12 @@ function Layout() {
   const [sortOptions, setSortOptions] = useState([]);
   const [browseGroups, setBrowseGroups] = React.useState([]);
   const [rootBrowseGroupId, setRootBrowseGroupId] = React.useState([]);
+  const [isLoggedIn, setIsLoggedIn] = React.useState(() => {
+    return !!window.cnstrc?.userId;
+  });
+  const [userId, setUserId] = React.useState(() => {
+    return window.cnstrc?.userId || null;
+  });
   let browseName = location.pathname.match(/[^/]+$/)?.[0];
 
   if (browseName === 'search') {
@@ -68,6 +74,40 @@ function Layout() {
     })();
   }, []);
 
+  const hashString = async (str) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(str);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    return hashHex;
+  };
+
+  const handleLoginToggle = async () => {
+    if (isLoggedIn) {
+      // Log out
+      window.cnstrc = window.cnstrc || {};
+      delete window.cnstrc.userId;
+      setIsLoggedIn(false);
+      setUserId(null);
+      console.log('Constructor.io: User logged out, userId removed');
+    } else {
+      // Generate random email and hash it
+      const randomEmail = `user${Math.random().toString(36).substring(2, 8)}@mail.com`;
+      const hashedUserId = await hashString(randomEmail);
+
+      window.cnstrc = window.cnstrc || {};
+      window.cnstrc.userId = hashedUserId;
+      setIsLoggedIn(true);
+      setUserId(hashedUserId);
+      console.log('Constructor.io: User logged in');
+      console.log('  Original email:', randomEmail);
+      console.log('  Hashed userId:', hashedUserId);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col text-lg sm:text-base">
       <div className="flex flex-row items-center justify-between w-full mb-2 md:mb-5 relative">
@@ -75,6 +115,54 @@ function Layout() {
         <div className="flex items-center gap-4">
           <AutocompleteSearch />
           <div className="flex items-center gap-2">
+            <div className="relative group">
+              <button
+                type="button"
+                onClick={handleLoginToggle}
+                className={`relative p-2 transition-colors ${
+                  isLoggedIn
+                    ? 'text-green-600 hover:text-green-700'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+                aria-label={isLoggedIn ? 'Log out' : 'Log in'}
+                title={
+                  isLoggedIn
+                    ? `Logged in as ${userId}`
+                    : 'Click to simulate login'
+                }
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill={isLoggedIn ? 'currentColor' : 'none'}
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+                  />
+                </svg>
+                {isLoggedIn && (
+                  <span className="absolute -top-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white" />
+                )}
+              </button>
+              <div className="absolute right-0 top-full mt-1 w-64 bg-stone-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg">
+                <p className="font-semibold mb-1">
+                  {isLoggedIn ? 'Logged In (Debug Mode)' : 'Logged Out'}
+                </p>
+                <p className="text-stone-300">
+                  {isLoggedIn
+                    ? `userId: ${userId}`
+                    : 'Click to simulate logged-in user for personalization testing'}
+                </p>
+                <p className="text-stone-400 mt-1 text-[10px]">
+                  Sets window.cnstrc.userId
+                </p>
+              </div>
+            </div>
             <button
               type="button"
               onClick={() => navigate('/wishlist')}
