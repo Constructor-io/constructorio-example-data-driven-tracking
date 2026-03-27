@@ -87,28 +87,14 @@ function Search() {
           page={page}
           loadMoreStatus={loadMoreStatus}
           loadMoreSearchResults={loadMoreSearchResultsAndSetState}
-          dataAttributes={{ 'data-cnstrc-search': '' }}
+          dataAttributes={{
+            'data-cnstrc-search': '',
+            'data-cnstrc-result-id': resultId,
+            'data-cnstrc-result-page': page,
+          }}
           error={error}
         />
       )}
-      {
-        !isLoading && (loadStatus === loadStatuses.SUCCESS && numItems >= 1)
-          && (
-          <Results
-            items={ items }
-            totalResults={ totalResults }
-            page={ page }
-            loadMoreStatus={ loadMoreStatus }
-            loadMoreSearchResults={ loadMoreSearchResultsAndSetState }
-            dataAttributes={ {
-              'data-cnstrc-search': '',
-              'data-cnstrc-result-id': resultId,
-              'data-cnstrc-result-page': page,
-            } }
-            error={ error }
-          />
-          )
-      }
       {!isLoading && (loadStatus === loadStatuses.FAILED || numItems === 0) && (
         <div
           className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 w-full"

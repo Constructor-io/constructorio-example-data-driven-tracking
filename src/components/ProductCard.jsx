@@ -9,10 +9,11 @@ function ProductCard({ product }) {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [addedToCart, setAddedToCart] = useState(false);
+  const isRecommendation = !!product.strategy?.id;
   const imageTagClassesLoading =
-    "w-[225px] md:w-[300px] h-[225px] t-cover transition-opacity opacity-0 ml-auto mr-auto";
+    "w-full h-[225px] object-cover transition-opacity opacity-0 ml-auto mr-auto";
   const imageTagClassesLoaded =
-    "w-[225px] md:w-[300px] h-[225px] object-cover transition-opacity opacity-100 ml-auto mr-auto";
+    "w-full h-[225px] object-cover transition-opacity opacity-100 ml-auto mr-auto";
 
   const handleClick = () => {
     navigate(`/product/${product.data.id}`);
@@ -45,6 +46,12 @@ function ProductCard({ product }) {
       data-cnstrc-item-name={product.value}
       data-cnstrc-item-variation-id={product.data?.variation_id}
       data-cnstrc-item-price={price}
+      {...(isRecommendation
+        ? {
+            "data-cnstrc-item": "recommendation",
+            "data-cnstrc-strategy-id": product.strategy.id,
+          }
+        : {})}
     >
       <div
         className="cursor-pointer flex-grow flex flex-col"

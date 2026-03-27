@@ -87,6 +87,28 @@ function ProductPage() {
     }));
   };
 
+  // Find the variation that matches all currently selected facet options
+  const matchedVariation = useMemo(() => {
+    const activeSelections = Object.entries(selectedOptions).filter(
+      ([, v]) => v != null,
+    );
+    if (!activeSelections.length || !variations.length) return null;
+
+    return variations.find((variation) => {
+      const facets = variation.data?.facets || [];
+      return activeSelections.every(([facetName, selectedValue]) =>
+        facets.some(
+          (f) =>
+            f.name === facetName &&
+            f.values.map(String).includes(String(selectedValue)),
+        ),
+      );
+    });
+  }, [selectedOptions, variations]);
+
+  const activeVariationId =
+    matchedVariation?.data?.variation_id || product?.data?.variation_id;
+
   const fullPrice = product?.data?.full_price;
   const price = product?.data?.price;
   const hasDiscount = fullPrice && fullPrice > price;
@@ -126,7 +148,7 @@ function ProductPage() {
       data-cnstrc-product-detail
       data-cnstrc-item-id={product.data?.id}
       data-cnstrc-item-name={product.value}
-      data-cnstrc-item-variation-id={product.data?.variation_id}
+      data-cnstrc-item-variation-id={activeVariationId}
       data-cnstrc-item-price={displayPrice}
     >
       <nav className="mb-6">

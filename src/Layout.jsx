@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import {
   Outlet,
   useLocation,
@@ -39,11 +39,21 @@ function Layout() {
   const [browseGroups, setBrowseGroups] = React.useState([]);
   const [rootBrowseGroupId, setRootBrowseGroupId] = React.useState([]);
   const [isLoggedIn, setIsLoggedIn] = React.useState(() => {
-    return !!window.cnstrc?.userId;
+    return localStorage.getItem('cnstrc-logged-in') === 'true';
   });
   const [userId, setUserId] = React.useState(() => {
-    return window.cnstrc?.userId || null;
+    return localStorage.getItem('cnstrc-user-id') || null;
   });
+  // Restore window.cnstrc.userId from localStorage on mount / when login state changes
+  useEffect(() => {
+    if (isLoggedIn && userId) {
+      window.cnstrc = window.cnstrc || {};
+      window.cnstrc.userId = userId;
+    } else if (window.cnstrc) {
+      delete window.cnstrc.userId;
+    }
+  }, [isLoggedIn, userId]);
+
   let browseName = location.pathname.match(/[^/]+$/)?.[0];
 
   if (browseName === 'search') {
@@ -88,20 +98,20 @@ function Layout() {
   const handleLoginToggle = async () => {
     if (isLoggedIn) {
       // Log out
-      window.cnstrc = window.cnstrc || {};
-      delete window.cnstrc.userId;
       setIsLoggedIn(false);
       setUserId(null);
+      localStorage.setItem('cnstrc-logged-in', 'false');
+      localStorage.removeItem('cnstrc-user-id');
       console.log('Constructor.io: User logged out, userId removed');
     } else {
       // Generate random email and hash it
       const randomEmail = `user${Math.random().toString(36).substring(2, 8)}@mail.com`;
       const hashedUserId = await hashString(randomEmail);
 
-      window.cnstrc = window.cnstrc || {};
-      window.cnstrc.userId = hashedUserId;
       setIsLoggedIn(true);
       setUserId(hashedUserId);
+      localStorage.setItem('cnstrc-logged-in', 'true');
+      localStorage.setItem('cnstrc-user-id', hashedUserId);
       console.log('Constructor.io: User logged in');
       console.log('  Original email:', randomEmail);
       console.log('  Hashed userId:', hashedUserId);
@@ -149,11 +159,11 @@ function Layout() {
                   <span className="absolute -top-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white" />
                 )}
               </button>
-              <div className="absolute right-0 top-full mt-1 w-64 bg-stone-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg">
+              <div className="absolute right-0 top-full mt-1 w-80 bg-stone-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg">
                 <p className="font-semibold mb-1">
                   {isLoggedIn ? 'Logged In (Debug Mode)' : 'Logged Out'}
                 </p>
-                <p className="text-stone-300">
+                <p className="text-stone-300 break-all">
                   {isLoggedIn
                     ? `userId: ${userId}`
                     : 'Click to simulate logged-in user for personalization testing'}
