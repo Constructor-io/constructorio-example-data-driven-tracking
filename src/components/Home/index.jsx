@@ -75,7 +75,7 @@ function Home() {
             Curated Collection
           </p>
           <h1 className="text-4xl md:text-6xl font-light text-white mb-6 tracking-tight">
-            TIS Threads
+            Integrations
           </h1>
           <p className="text-lg text-stone-300 mb-10 max-w-xl mx-auto font-light">
             Timeless pieces crafted for the modern wardrobe.
