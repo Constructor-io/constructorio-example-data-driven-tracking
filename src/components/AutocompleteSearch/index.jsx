@@ -2,21 +2,15 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import cioClient from '../../app/cioClient';
 
-const ZERO_STATE_SUGGESTIONS = [
-  { value: 'New Arrivals' },
-  { value: 'Best Sellers' },
-  { value: 'Sale' },
-  { value: 'Shirts' },
-  { value: 'Pants' },
-  { value: 'Jackets' },
-];
-
 function AutocompleteSearch() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState({ suggestions: [], products: [] });
   const [zeroStateProducts, setZeroStateProducts] = useState([]);
+  const [zeroStateProductsMeta, setZeroStateProductsMeta] = useState({ resultId: null, podId: null, numResults: 0 });
+  const [zeroStateSuggestions, setZeroStateSuggestions] = useState([]);
+  const [zeroStateSuggestionsMeta, setZeroStateSuggestionsMeta] = useState({ resultId: null, podId: null, numResults: 0 });
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
   const [isZeroState, setIsZeroState] = useState(false);
@@ -26,7 +20,7 @@ function AutocompleteSearch() {
   const debounceRef = useRef(null);
   const zeroStateFetchedRef = useRef(false);
 
-  const currentSuggestions = isZeroState ? ZERO_STATE_SUGGESTIONS : results.suggestions;
+  const currentSuggestions = isZeroState ? zeroStateSuggestions : results.suggestions;
   const currentProducts = isZeroState ? zeroStateProducts : results.products;
 
   const allItems = [
@@ -34,15 +28,36 @@ function AutocompleteSearch() {
     ...currentProducts.map((item) => ({ ...item, section: 'Products' })),
   ];
 
-  const fetchZeroStateProducts = useCallback(async () => {
+  const fetchZeroStateData = useCallback(async () => {
     if (zeroStateFetchedRef.current) return;
     
     try {
-      const response = await cioClient.recommendations.getRecommendations('home_page_1', {
-        numResults: 6,
-      });
-      const products = response?.response?.results || [];
+      const [productsResponse, suggestionsResponse] = await Promise.all([
+        cioClient.recommendations.getRecommendations('home_page_1', {
+          numResults: 6,
+        }),
+        cioClient.recommendations.getRecommendations('popular-searches', {
+          numResults: 6,
+          section: "Search Suggestions",
+        }),
+      ]);
+
+      const products = productsResponse?.response?.results || [];
       setZeroStateProducts(products);
+      setZeroStateProductsMeta({
+        resultId: productsResponse?.result_id,
+        podId: productsResponse?.response?.pod?.id,
+        numResults: productsResponse?.response?.total_num_results || products.length,
+      });
+
+      const suggestions = suggestionsResponse?.response?.results || [];
+      setZeroStateSuggestions(suggestions);
+      setZeroStateSuggestionsMeta({
+        resultId: suggestionsResponse?.result_id,
+        podId: suggestionsResponse?.response?.pod?.id,
+        numResults: suggestionsResponse?.response?.total_num_results || suggestions.length,
+      });
+
       zeroStateFetchedRef.current = true;
     } catch (error) {
       console.error('Zero state recommendations error:', error);
@@ -103,7 +118,7 @@ function AutocompleteSearch() {
   const handleFocus = () => {
     if (!query.trim()) {
       setIsZeroState(true);
-      fetchZeroStateProducts();
+      fetchZeroStateData();
       setIsOpen(true);
     } else if (allItems.length > 0) {
       setIsOpen(true);
@@ -241,13 +256,21 @@ function AutocompleteSearch() {
       {isOpen && (
         <div
           id="autocomplete-results"
-          data-cnstrc-autosuggest
+          {...(!isZeroState ? { 'data-cnstrc-autosuggest': '' } : {})}
           className="absolute z-50 w-[600px] right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[400px] overflow-y-auto"
           role="listbox"
         >
           <div className="flex">
             {currentSuggestions.length > 0 && (
-              <div className="p-3 w-1/3 border-r border-gray-100">
+              <div
+                className="p-3 w-1/3 border-r border-gray-100"
+                {...(isZeroState ? {
+                  'data-cnstrc-recommendations': '',
+                  'data-cnstrc-recommendations-pod-id': zeroStateSuggestionsMeta.podId,
+                  'data-cnstrc-result-id': zeroStateSuggestionsMeta.resultId,
+                  'data-cnstrc-num-results': zeroStateSuggestionsMeta.numResults,
+                } : {})}
+              >
                 <h3 className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase mb-1">
                   {isZeroState ? 'Popular Searches' : 'Search Suggestions'}
                 </h3>
@@ -262,8 +285,14 @@ function AutocompleteSearch() {
                         id={`autocomplete-item-${itemIndex}`}
                         role="option"
                         aria-selected={isHighlighted}
-                        data-cnstrc-item-section="Search Suggestions"
                         data-cnstrc-item-name={item.value}
+                        {...(isZeroState ? {
+                          'data-cnstrc-item': 'recommendation',
+                          'data-cnstrc-strategy-id': item.strategy?.id,
+                          'data-cnstrc-item-section': 'Search Suggestions',
+                        } : {
+                          'data-cnstrc-item-section': 'Search Suggestions',
+                        })}
                         className={`px-3 py-2 cursor-pointer rounded text-sm ${
                           isHighlighted ? 'bg-blue-100' : 'hover:bg-gray-100'
                         }`}
@@ -279,7 +308,15 @@ function AutocompleteSearch() {
             )}
 
             {currentProducts.length > 0 && (
-              <div className="p-3 flex-1">
+              <div
+                className="p-3 flex-1"
+                {...(isZeroState ? {
+                  'data-cnstrc-recommendations': '',
+                  'data-cnstrc-recommendations-pod-id': zeroStateProductsMeta.podId,
+                  'data-cnstrc-result-id': zeroStateProductsMeta.resultId,
+                  'data-cnstrc-num-results': zeroStateProductsMeta.numResults,
+                } : {})}
+              >
                 <h3 className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase mb-1">
                   {isZeroState ? 'Trending Products' : 'Products'}
                 </h3>
@@ -295,9 +332,17 @@ function AutocompleteSearch() {
                         id={`autocomplete-item-${itemIndex}`}
                         role="option"
                         aria-selected={isHighlighted}
-                        data-cnstrc-item-section="Products"
                         data-cnstrc-item-name={item.value}
                         data-cnstrc-item-id={item.data?.id}
+                        {...(isZeroState ? {
+                          'data-cnstrc-item': 'recommendation',
+                          'data-cnstrc-item-variation-id': item.data?.variation_id,
+                          'data-cnstrc-strategy-id': item.strategy?.id,
+                          'data-cnstrc-item-price': price,
+                          'data-cnstrc-item-section': 'Products',
+                        } : {
+                          'data-cnstrc-item-section': 'Products',
+                        })}
                         className={`p-2 cursor-pointer rounded flex flex-col items-center text-center ${
                           isHighlighted ? 'bg-blue-100' : 'hover:bg-gray-100'
                         }`}
