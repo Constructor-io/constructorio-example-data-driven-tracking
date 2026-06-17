@@ -56,6 +56,7 @@ const ROW_THRESHOLD = 30; // px — items within this vertical distance are cons
 
 const SPECIAL_TAGS = [
   "data-cnstrc-search",
+  "data-cnstrc-search-term",
   "data-cnstrc-num-results",
   "data-cnstrc-browse",
   "data-cnstrc-filter-name",
@@ -228,6 +229,11 @@ function CnstrcHighlighter() {
     (element, matchingAttributes, container, palette, elementType) => {
       const rect = element.getBoundingClientRect();
       if (rect.width === 0 || rect.height === 0) return;
+
+      // Skip elements that are entirely outside the viewport
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      if (rect.bottom < 0 || rect.top > vh || rect.right < 0 || rect.left > vw) return;
 
       const config = getResponsiveConfig();
       const isSpecial = matchingAttributes.some((l) =>
@@ -474,8 +480,11 @@ function CnstrcHighlighter() {
     overlayMapRef.current.forEach(({ box, label, attributes, elementType }, element) => {
       const rect = element.getBoundingClientRect();
 
-      // Hide overlays for elements that are no longer visible
-      if (rect.width === 0 || rect.height === 0) {
+      // Hide overlays for elements that are no longer visible or outside viewport
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      if (rect.width === 0 || rect.height === 0 ||
+          rect.bottom < 0 || rect.top > vh || rect.right < 0 || rect.left > vw) {
         box.style.display = "none";
         label.style.display = "none";
         return;
