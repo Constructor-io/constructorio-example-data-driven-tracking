@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { FiltersContext } from '../../Layout';
 import { fetchSearchResults, loadMoreSearchResults } from '../../utils';
 import { loadStatuses } from '../../utils/constants';
@@ -9,6 +9,8 @@ import Results from '../Results';
 function Search() {
   const { setFacets, setGroups, setSortOptions } = useContext(FiltersContext);
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get('q') || '';
   const [page, setPage] = useState(1);
   const [loadStatus, setLoadStatus] = useState(loadStatuses.SUCCESS);
   const [loadMoreStatus, setLoadMoreStatus] = useState(loadStatuses.SUCCESS);
@@ -89,6 +91,7 @@ function Search() {
           loadMoreSearchResults={loadMoreSearchResultsAndSetState}
           dataAttributes={{
             'data-cnstrc-search': '',
+            'data-cnstrc-search-term': searchTerm,
             'data-cnstrc-result-id': resultId,
             'data-cnstrc-result-page': page,
           }}
@@ -100,6 +103,7 @@ function Search() {
           className="bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3 w-full"
           role="alert"
           data-cnstrc-search
+          data-cnstrc-search-term={searchTerm}
           data-cnstrc-zero-result
           data-cnstrc-result-id={resultId}
           data-cnstrc-num-results="0"
