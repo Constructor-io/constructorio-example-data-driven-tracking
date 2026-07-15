@@ -43,6 +43,7 @@ function WishlistPage() {
               data-cnstrc-item-id={item.data.id}
               data-cnstrc-item-name={item.value}
               data-cnstrc-item-variation-id={item.data?.variation_id}
+              data-cnstrc-item-price={price}
             >
               <div
                 className="cursor-pointer mb-4"
