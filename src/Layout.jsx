@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { createContext, useEffect, useState } from 'react';
 import {
+  Link,
   Outlet,
   useLocation,
   useNavigate,
@@ -159,18 +160,26 @@ function Layout() {
                   <span className="absolute -top-1 -right-1 bg-green-500 w-3 h-3 rounded-full border-2 border-white" />
                 )}
               </button>
-              <div className="absolute right-0 top-full mt-1 w-80 bg-stone-900 text-white text-xs rounded-lg p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg">
-                <p className="font-semibold mb-1">
-                  {isLoggedIn ? 'Logged In (Debug Mode)' : 'Logged Out'}
-                </p>
-                <p className="text-stone-300 break-all">
-                  {isLoggedIn
-                    ? `userId: ${userId}`
-                    : 'Click to simulate logged-in user for personalization testing'}
-                </p>
-                <p className="text-stone-400 mt-1 text-[10px]">
-                  Sets window.cnstrc.userId
-                </p>
+              <div className="absolute right-0 top-full pt-2 w-80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="bg-stone-900 text-white text-xs rounded-lg p-3 shadow-lg">
+                  <p className="font-semibold mb-1">
+                    {isLoggedIn ? 'Logged In (Debug Mode)' : 'Logged Out'}
+                  </p>
+                  <p className="text-stone-300 break-all">
+                    {isLoggedIn
+                      ? `userId: ${userId}`
+                      : 'Click to simulate logged-in user for personalization testing'}
+                  </p>
+                  <p className="text-stone-400 mt-1 text-[10px]">
+                    Sets window.cnstrc.userId
+                  </p>
+                  <Link
+                    to="/login-info"
+                    className="inline-block mt-2 text-blue-300 hover:text-blue-200 underline text-[11px]"
+                  >
+                    Learn about logged in vs. logged out &rarr;
+                  </Link>
+                </div>
               </div>
             </div>
             <button
@@ -236,6 +245,7 @@ function Layout() {
         {location.pathname !== '/' &&
           !location.pathname.startsWith('/cart') &&
           !location.pathname.startsWith('/wishlist') &&
+          !location.pathname.startsWith('/login-info') &&
           !location.pathname.startsWith('/checkout') &&
           !location.pathname.startsWith('/order-confirmation') && (
             <div
@@ -251,6 +261,7 @@ function Layout() {
             !location.pathname.startsWith('/product/') &&
             !location.pathname.startsWith('/cart') &&
             !location.pathname.startsWith('/wishlist') &&
+            !location.pathname.startsWith('/login-info') &&
             !location.pathname.startsWith('/checkout') &&
             !location.pathname.startsWith('/order-confirmation') && (
               <div className="flex flex-col sm:flex-row align-end justify-between items-center sm:items-start mb-6">

@@ -1,10 +1,31 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { createContext, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+
+const WISHLIST_STORAGE_KEY = 'tis_wishlist';
 
 const WishlistContext = createContext();
 
+const getInitialWishlist = () => {
+  try {
+    const stored = localStorage.getItem(WISHLIST_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
+};
+
 export function WishlistProvider({ children }) {
-  const [wishlistItems, setWishlistItems] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState(getInitialWishlist);
+
+  useEffect(() => {
+    localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
 
   const addToWishlist = (product) => {
     setWishlistItems((prev) => {

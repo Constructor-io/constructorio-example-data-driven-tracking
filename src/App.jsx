@@ -5,6 +5,7 @@ import CartPage from './components/CartPage';
 import CheckoutPage from './components/CheckoutPage';
 import CnstrcHighlighter from './components/CnstrcHighlighter';
 import Home from './components/Home';
+import LoginInfo from './components/LoginInfo';
 import OrderConfirmationPage from './components/OrderConfirmationPage';
 import ProductPage from './components/ProductPage';
 import Search from './components/Search/Search';
@@ -29,6 +30,7 @@ function App() {
               <Route path="product/:itemId" element={<ProductPage />} />
               <Route path="cart" element={<CartPage />} />
               <Route path="wishlist" element={<WishlistPage />} />
+              <Route path="login-info" element={<LoginInfo />} />
               <Route path="checkout" element={<CheckoutPage />} />
               <Route
                 path="order-confirmation"
