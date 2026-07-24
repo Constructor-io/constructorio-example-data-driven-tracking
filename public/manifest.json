@@ -3,9 +3,9 @@
   "name": "Constructor React Example",
   "icons": [
     {
-      "src": "https://constructor.io/wp-content/uploads/2021/05/cropped-favicon-32x32-1-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+      "src": "favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
     }
   ],
   "start_url": ".",
