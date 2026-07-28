@@ -24,7 +24,7 @@ function CartPage() {
 
   return (
     <div className="cart-page">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart ({cartCount} items)</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart ({cartCount} {cartCount === 1 ? 'item' : 'items'})</h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-2/3">
@@ -93,7 +93,7 @@ function CartPage() {
 
             <div className="space-y-3 mb-6">
               <div className="flex justify-between text-gray-600">
-                <span>Subtotal ({cartCount} items)</span>
+                <span>Subtotal ({cartCount} {cartCount === 1 ? 'item' : 'items'})</span>
                 <span>${cartTotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-gray-600">
