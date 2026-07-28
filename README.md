@@ -1,16 +1,16 @@
-# Constructor.io Behavioral Tracking Example (React)
+# Constructor Data Driven Tracking Example
 
-[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Constructor-io/constructorio-example-react/blob/master/LICENSE)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Constructor-io/constructorio-example-data-driven-tracking/blob/master/LICENSE)
 
-A React reference storefront that demonstrates how to surface [Constructor.io](http://constructor.io/) behavioral tracking through **data-driven event tracking** — the declarative `data-cnstrc-*` HTML attributes that let Constructor automatically capture user behavior without hand-wiring tracker calls.
+A React reference storefront that demonstrates how to surface [Constructor](https://constructor.com/) behavioral tracking through **data-driven event tracking** — the declarative `data-cnstrc-*` HTML attributes that let Constructor automatically capture user behavior without hand-wiring tracker calls.
 
-[Constructor.io](http://constructor.io/) provides search as a service that optimizes results using artificial intelligence (including natural language processing, re-ranking to optimize for conversions, and user personalization). High-quality behavioral data is what powers that optimization, so getting tracking right is one of the most important parts of any integration.
+[Constructor](https://constructor.com/) provides search as a service that optimizes results using artificial intelligence (including natural language processing, re-ranking to optimize for conversions, and user personalization). High-quality behavioral data is what powers that optimization, so getting tracking right is one of the most important parts of any integration.
 
 This project exists to show, in real working code, **how a customer surfaces those attributes** across a complete shopping flow. The primary reference is the official guide:
 
 > **[Data-Driven Event Tracking →](https://docs.constructor.com/docs/integrating-with-constructor-behavioral-tracking-data-driven-event-tracking)**
 
-A live version of this application can be found on [Github Pages](https://constructor-io.github.io/constructorio-example-react/).
+A live version of this application can be found on [Github Pages](https://constructor-io.github.io/constructorio-example-data-driven-tracking/).
 
 ## What is data-driven event tracking?
 
@@ -134,22 +134,6 @@ npm run start
 
 When running, the application is available at http://localhost:3000/.
 
-## Configuration
-
-The Constructor client is instantiated in `src/app/cioClient.js`:
-
-```javascript
-import ConstructorIOClient from '@constructor-io/constructorio-client-javascript';
-
-const cioClient = new ConstructorIOClient({
-  apiKey: 'YOUR API KEY',
-});
-
-export default cioClient;
-```
-
-Replace the `apiKey` value with your own key to point the sandbox at your index. You can find your key in the [Constructor.io dashboard](https://app.constructor.io/dashboard). Contact sales to sign up, or support if your company already has an account.
-
 ## Available commands
 
 ```bash
@@ -170,6 +154,5 @@ npm run deploy  # publish ./build to Github Pages
 ## Further resources
 
 - [Data-driven event tracking guide](https://docs.constructor.com/docs/integrating-with-constructor-behavioral-tracking-data-driven-event-tracking) — the primary reference this example illustrates
-- [Constructor.io documentation](https://docs.constructor.com/)
+- [Constructor documentation](https://docs.constructor.com/)
 - [JavaScript client documentation](https://constructor-io.github.io/constructorio-client-javascript/index.html)
-- [Constructor.io homepage](http://constructor.io/)
