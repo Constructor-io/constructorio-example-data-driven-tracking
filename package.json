@@ -74,7 +74,9 @@
     "deploy": "gh-pages -d build",
     "start": "node --localstorage-file=.localstorage scripts/start.js",
     "build": "node --localstorage-file=.localstorage scripts/build.js",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js",
+    "lint": "NODE_ENV=development eslint src --ext .js,.jsx",
+    "lint:fix": "NODE_ENV=development eslint src --ext .js,.jsx --fix"
   },
   "eslintConfig": {
     "extends": "react-app",
