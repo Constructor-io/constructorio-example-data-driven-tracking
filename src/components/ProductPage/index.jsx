@@ -143,14 +143,7 @@ function ProductPage() {
   }
 
   return (
-    <div
-      className="product-page"
-      data-cnstrc-product-detail
-      data-cnstrc-item-id={product.data?.id}
-      data-cnstrc-item-name={product.value}
-      data-cnstrc-item-variation-id={activeVariationId}
-      data-cnstrc-item-price={displayPrice}
-    >
+    <div className="product-page">
       <nav className="mb-6">
         <button
           type="button"
@@ -161,7 +154,14 @@ function ProductPage() {
         </button>
       </nav>
 
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+      <div
+        className="flex flex-col lg:flex-row gap-8 lg:gap-12"
+        data-cnstrc-product-detail
+        data-cnstrc-item-id={product.data?.id}
+        data-cnstrc-item-name={product.value}
+        data-cnstrc-item-variation-id={activeVariationId}
+        data-cnstrc-item-price={displayPrice}
+      >
         <div className="lg:w-1/2">
           <div className="aspect-square bg-gray-100 rounded-xl overflow-hidden">
             <img
