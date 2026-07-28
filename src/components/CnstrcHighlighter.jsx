@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
 
-const CONSTRUCTOR_FAVICON_URL = "https://constructor.io/favicon.ico";
+const CONSTRUCTOR_FAVICON_URL = `${process.env.PUBLIC_URL || ""}/favicon.svg`;
 
 const OVERLAY_CONTAINER_ID = "cnstrc-highlight-container";
 
@@ -154,7 +154,17 @@ function CnstrcHighlighter() {
       let left;
       let top;
 
-      if (isSpecial) {
+      if (elementType === "search-field") {
+        // Search widget sits near the top of the page. Anchor above, but when
+        // that clips the top edge, clamp to the top margin instead of flipping
+        // below — flipping below drops labels into the nav bar underneath.
+        left = rect.left;
+        top = Math.max(margin, rect.top - labelHeight - 8);
+      } else if (elementType === "search-input") {
+        // Below the input, so it doesn't collide with the form/submit labels above.
+        left = rect.left;
+        top = rect.bottom + 4;
+      } else if (isSpecial) {
         // Preferred: above the element
         left = rect.left;
         top = rect.top - labelHeight - 8;
@@ -189,10 +199,14 @@ function CnstrcHighlighter() {
     [],
   );
 
-  // 2D collision avoidance — nudge labels down to avoid overlap
-  const resolveCollision = useCallback((labelRect) => {
+  // 2D collision avoidance — nudge labels to avoid overlap.
+  // Search-field labels nudge UP (toward the top margin) so the form/input/
+  // submit-btn labels don't cascade DOWN over the nav bar beneath the search box.
+  const resolveCollision = useCallback((labelRect, elementType) => {
     const placed = labelRectsRef.current;
     const config = getResponsiveConfig();
+    const step = config.lineHeight + 4;
+    const nudgeUp = elementType === "search-field";
 
     for (let attempts = 0; attempts < 20; attempts += 1) {
       let overlap = false;
@@ -203,7 +217,7 @@ function CnstrcHighlighter() {
         }
       }
       if (!overlap) break;
-      labelRect.top += config.lineHeight + 4;
+      labelRect.top += nudgeUp ? -step : step;
     }
 
     placed.push({ ...labelRect });
@@ -301,12 +315,15 @@ function CnstrcHighlighter() {
         isSpecial,
         elementType,
       );
-      const resolved = resolveCollision({
-        left: pos.left,
-        top: pos.top,
-        width: estLabelWidth,
-        height: estLabelHeight,
-      });
+      const resolved = resolveCollision(
+        {
+          left: pos.left,
+          top: pos.top,
+          width: estLabelWidth,
+          height: estLabelHeight,
+        },
+        elementType,
+      );
       label.style.left = `${resolved.left}px`;
       label.style.top = `${resolved.top}px`;
 
@@ -329,10 +346,18 @@ function CnstrcHighlighter() {
     const hasProductDetail = el.hasAttribute("data-cnstrc-product-detail");
     const hasBtn = el.hasAttribute("data-cnstrc-btn");
     const hasItemSection = el.hasAttribute("data-cnstrc-item-section");
+    const hasSearchInput = el.hasAttribute("data-cnstrc-search-input");
+    const hasSearchField =
+      el.hasAttribute("data-cnstrc-search-form") ||
+      el.hasAttribute("data-cnstrc-search-submit-btn");
 
     if (hasBtn) return "action-btn";
     if (hasItemSection) return "autocomplete-item";
     if (hasItemId && !hasProductDetail) return "item-card";
+    // The input label goes below its box; the form/submit-btn labels go above.
+    // Splitting them avoids stacking three labels in the same spot over the input.
+    if (hasSearchInput) return "search-input";
+    if (hasSearchField) return "search-field";
     return "container";
   }, []);
 
@@ -368,7 +393,7 @@ function CnstrcHighlighter() {
       if (matchingAttributes.length === 0) return;
 
       const type = classifyElement(el);
-      const entry = { el, matchingAttributes };
+      const entry = { el, matchingAttributes, type };
 
       if (type === "item-card") itemCards.push(entry);
       else if (type === "autocomplete-item") autocompleteItems.push(entry);
@@ -423,7 +448,7 @@ function CnstrcHighlighter() {
 
     // Phase 3: Create overlays — containers cycle through palette, items stay blue
     let containerColorIdx = 0;
-    containers.forEach(({ el, matchingAttributes }) => {
+    containers.forEach(({ el, matchingAttributes, type }) => {
       // When autosuggest is open, only render autocomplete-related containers
       const isAcContainer = el.hasAttribute("data-cnstrc-autosuggest")
         || el.hasAttribute("data-cnstrc-search-form")
@@ -435,7 +460,7 @@ function CnstrcHighlighter() {
       const pal =
         CONTAINER_PALETTES[containerColorIdx % CONTAINER_PALETTES.length];
       containerColorIdx += 1;
-      createOverlay(el, matchingAttributes, container, pal, "container");
+      createOverlay(el, matchingAttributes, container, pal, type);
     });
 
     autocompleteItems.forEach(({ el, matchingAttributes }) => {
@@ -514,12 +539,15 @@ function CnstrcHighlighter() {
         isSpecial,
         elementType,
       );
-      const resolved = resolveCollision({
-        left: pos.left,
-        top: pos.top,
-        width: estLabelWidth,
-        height: estLabelHeight,
-      });
+      const resolved = resolveCollision(
+        {
+          left: pos.left,
+          top: pos.top,
+          width: estLabelWidth,
+          height: estLabelHeight,
+        },
+        elementType,
+      );
 
       Object.assign(label.style, {
         left: `${resolved.left}px`,
