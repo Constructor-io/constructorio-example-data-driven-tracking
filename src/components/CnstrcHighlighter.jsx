@@ -103,7 +103,7 @@ function rectsOverlap(a, b) {
 function CnstrcHighlighter() {
   const [enabled, setEnabled] = useState(() => {
     const stored = localStorage.getItem("cnstrc-highlighter-enabled");
-    return stored === null ? false : stored === "true";
+    return stored === null ? true : stored === "true";
   });
   const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
   const [faviconError, setFaviconError] = useState(false);
