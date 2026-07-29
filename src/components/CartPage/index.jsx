@@ -37,10 +37,6 @@ function CartPage() {
                 <div
                   key={item.data.id}
                   className="flex gap-4 p-4 bg-white rounded-lg border border-gray-200"
-                  data-cnstrc-item-id={item.data.id}
-                  data-cnstrc-item-name={item.value}
-                  data-cnstrc-item-variation-id={item.data?.variation_id}
-                  data-cnstrc-item-price={price}
                 >
                   <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                     <img src={item.data?.image_url} alt={item.value} className="w-full h-full object-contain" />
