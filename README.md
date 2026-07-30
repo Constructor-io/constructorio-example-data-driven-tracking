@@ -4,6 +4,8 @@
 
 A React reference storefront that demonstrates how to surface [Constructor](https://constructor.com/) behavioral tracking through **data-driven event tracking** — the declarative `data-cnstrc-*` HTML attributes that let Constructor automatically capture user behavior without hand-wiring tracker calls.
 
+![Data driven tracking example screenshot](assets/constructor-data-driven-tracking-example-screenshot.png)
+
 [Constructor](https://constructor.com/) provides search as a service that optimizes results using artificial intelligence (including natural language processing, re-ranking to optimize for conversions, and user personalization). High-quality behavioral data is what powers that optimization, so getting tracking right is one of the most important parts of any integration.
 
 This project exists to show, in real working code, **how a customer surfaces those attributes** across a complete shopping flow. The primary reference is the official guide:
