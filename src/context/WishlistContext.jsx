@@ -1,6 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -27,7 +28,7 @@ export function WishlistProvider({ children }) {
     localStorage.setItem(WISHLIST_STORAGE_KEY, JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
-  const addToWishlist = (product) => {
+  const addToWishlist = useCallback((product) => {
     setWishlistItems((prev) => {
       const existingItem = prev.find((item) => item.data.id === product.data.id);
       if (existingItem) {
@@ -35,15 +36,16 @@ export function WishlistProvider({ children }) {
       }
       return [...prev, product];
     });
-  };
+  }, []);
 
-  const removeFromWishlist = (productId) => {
+  const removeFromWishlist = useCallback((productId) => {
     setWishlistItems((prev) => prev.filter((item) => item.data.id !== productId));
-  };
+  }, []);
 
-  const isInWishlist = (productId) => {
-    return wishlistItems.some((item) => item.data.id === productId);
-  };
+  const isInWishlist = useCallback(
+    (productId) => wishlistItems.some((item) => item.data.id === productId),
+    [wishlistItems]
+  );
 
   const wishlistCount = wishlistItems.length;
 
@@ -55,7 +57,13 @@ export function WishlistProvider({ children }) {
       isInWishlist,
       wishlistCount,
     }),
-    [wishlistItems, wishlistCount]
+    [
+      wishlistItems,
+      wishlistCount,
+      addToWishlist,
+      removeFromWishlist,
+      isInWishlist,
+    ]
   );
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

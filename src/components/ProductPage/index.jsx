@@ -9,18 +9,11 @@ import Loader from '../Loader';
 import Recommendations from '../Recommendations';
 
 const COLOR_FACET_NAMES = ['Color', 'color', 'Base Color'];
-const SIZE_FACET_NAMES = [
-  'Pant Fit',
-  'Pant Length',
-  'Pant Waist',
-  'Size',
-  'size',
-];
 
 function ProductPage() {
   const { itemId } = useParams();
   const navigate = useNavigate();
-  const { addToCart, cartCount } = useCart();
+  const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [product, setProduct] = useState(null);
   const [variations, setVariations] = useState([]);
