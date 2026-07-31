@@ -2,9 +2,24 @@
 import ConstructorIOClient from '@constructor-io/constructorio-client-javascript';
 import cioClient from '../app/cioClient';
 
+// The app is mounted in a HashRouter (see src/index.jsx), so the router keeps its
+// query string inside location.hash (for example "#/search?q=shirt") and
+// location.search stays empty. Read the hash first and fall back to
+// location.search so non-hash urls keep working.
+export function getUrlSearchString() {
+  const { hash, search } = window.location;
+  const hashQueryIndex = hash.indexOf('?');
+
+  if (hashQueryIndex !== -1) {
+    return hash.slice(hashQueryIndex);
+  }
+
+  return search;
+}
+
 export function parseUrlParameters() {
   let urlSearchParams;
-  const { search } = window.location;
+  const search = getUrlSearchString();
   const decodedURI = decodeURIComponent(search);
 
   // Custom functionality - allows usage of cnstrc request urls in the search bar
