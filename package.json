@@ -4,7 +4,7 @@
   "description": "A React sandbox example for integrating with Constructor",
   "author": "Constructor.io Corporation",
   "license": "MIT",
-  "homepage": "/",
+  "homepage": "https://constructor-io.github.io/constructorio-example-react-tis-sandbox",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Constructor-io/constructorio-example-react.git"
