@@ -1,13 +1,13 @@
 {
   "name": "constructorio-example-react",
   "version": "2.0.0",
-  "description": "A React sandbox example for integrating with Constructor",
+  "description": "A React reference storefront that demonstrates how to surface Constructor behavioral tracking through data-driven events.",
   "author": "Constructor.io Corporation",
   "license": "MIT",
-  "homepage": "https://constructor-io.github.io/constructorio-example-react-tis-sandbox",
+  "homepage": "https://github.com/Constructor-io/constructorio-example-data-driven-tracking",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Constructor-io/constructorio-example-react.git"
+    "url": "git+https://github.com/Constructor-io/constructorio-example-data-driven-tracking.git"
   },
   "dependencies": {
     "@babel/core": "^7.16.0",

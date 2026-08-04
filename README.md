@@ -2,7 +2,7 @@
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/Constructor-io/constructorio-example-data-driven-tracking/blob/master/LICENSE)
 
-A React reference storefront that demonstrates how to surface [Constructor](https://constructor.com/) behavioral tracking through **data-driven event tracking** — the declarative `data-cnstrc-*` HTML attributes that let Constructor automatically capture user behavior without hand-wiring tracker calls.
+A React reference storefront that demonstrates how to surface [Constructor](https://constructor.com/) behavioral tracking through **data-driven events** — the declarative `data-cnstrc-*` HTML attributes that let Constructor automatically capture user behavior without hand-wiring tracker calls.
 
 ![Data driven tracking example screenshot](assets/constructor-data-driven-tracking-example-screenshot.png)
 
