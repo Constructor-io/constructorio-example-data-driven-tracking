@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/constructorio-example-react-tis-sandbox/static/css/main.0150e10f.css",
-    "main.js": "/constructorio-example-react-tis-sandbox/static/js/main.a4155231.js",
-    "index.html": "/constructorio-example-react-tis-sandbox/index.html",
-    "main.0150e10f.css.map": "/constructorio-example-react-tis-sandbox/static/css/main.0150e10f.css.map",
-    "main.a4155231.js.map": "/constructorio-example-react-tis-sandbox/static/js/main.a4155231.js.map"
+    "main.css": "/Constructor-io/constructorio-example-data-driven-tracking/static/css/main.0150e10f.css",
+    "main.js": "/Constructor-io/constructorio-example-data-driven-tracking/static/js/main.a4ad423a.js",
+    "index.html": "/Constructor-io/constructorio-example-data-driven-tracking/index.html",
+    "main.0150e10f.css.map": "/Constructor-io/constructorio-example-data-driven-tracking/static/css/main.0150e10f.css.map",
+    "main.a4ad423a.js.map": "/Constructor-io/constructorio-example-data-driven-tracking/static/js/main.a4ad423a.js.map"
   },
   "entrypoints": [
     "static/css/main.0150e10f.css",
-    "static/js/main.a4155231.js"
+    "static/js/main.a4ad423a.js"
   ]
 }
