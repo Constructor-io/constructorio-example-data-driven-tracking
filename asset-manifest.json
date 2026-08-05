@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/Constructor-io/constructorio-example-data-driven-tracking/static/css/main.0150e10f.css",
-    "main.js": "/Constructor-io/constructorio-example-data-driven-tracking/static/js/main.a4ad423a.js",
-    "index.html": "/Constructor-io/constructorio-example-data-driven-tracking/index.html",
-    "main.0150e10f.css.map": "/Constructor-io/constructorio-example-data-driven-tracking/static/css/main.0150e10f.css.map",
-    "main.a4ad423a.js.map": "/Constructor-io/constructorio-example-data-driven-tracking/static/js/main.a4ad423a.js.map"
+    "main.css": "/constructorio-example-data-driven-tracking/static/css/main.0150e10f.css",
+    "main.js": "/constructorio-example-data-driven-tracking/static/js/main.69629597.js",
+    "index.html": "/constructorio-example-data-driven-tracking/index.html",
+    "main.0150e10f.css.map": "/constructorio-example-data-driven-tracking/static/css/main.0150e10f.css.map",
+    "main.69629597.js.map": "/constructorio-example-data-driven-tracking/static/js/main.69629597.js.map"
   },
   "entrypoints": [
     "static/css/main.0150e10f.css",
-    "static/js/main.a4ad423a.js"
+    "static/js/main.69629597.js"
   ]
 }
