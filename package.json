@@ -1,6 +1,6 @@
 {
   "name": "constructorio-example-react",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A React reference storefront that demonstrates how to surface Constructor behavioral tracking through data-driven events.",
   "author": "Constructor.io Corporation",
   "license": "MIT",
