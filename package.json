@@ -4,7 +4,7 @@
   "description": "A React reference storefront that demonstrates how to surface Constructor behavioral tracking through data-driven events.",
   "author": "Constructor.io Corporation",
   "license": "MIT",
-  "homepage": "https://github.com/Constructor-io/constructorio-example-data-driven-tracking",
+  "homepage": "https://constructor-io.github.io/constructorio-example-data-driven-tracking",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Constructor-io/constructorio-example-data-driven-tracking.git"
