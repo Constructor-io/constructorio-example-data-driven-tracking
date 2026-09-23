@@ -297,7 +297,6 @@ function AutocompleteSearch() {
                           isHighlighted ? 'bg-blue-100' : 'hover:bg-gray-100'
                         }`}
                         onClick={() => handleItemSelect({ ...item, section: 'Search Suggestions' })}
-                        onMouseEnter={() => setHighlightedIndex(itemIndex)}
                       >
                         <span className="text-gray-800">{item.value}</span>
                       </li>
@@ -347,7 +346,6 @@ function AutocompleteSearch() {
                           isHighlighted ? 'bg-blue-100' : 'hover:bg-gray-100'
                         }`}
                         onClick={() => handleItemSelect({ ...item, section: 'Products' })}
-                        onMouseEnter={() => setHighlightedIndex(itemIndex)}
                       >
                         {item.data?.image_url && (
                           <img
