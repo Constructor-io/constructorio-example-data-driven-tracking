@@ -256,7 +256,7 @@ function AutocompleteSearch() {
       {isOpen && (
         <div
           id="autocomplete-results"
-          {...(!isZeroState ? { 'data-cnstrc-autosuggest': '' } : {})}
+          data-cnstrc-autosuggest
           className="absolute z-50 w-[600px] right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[400px] overflow-y-auto"
           role="listbox"
         >
