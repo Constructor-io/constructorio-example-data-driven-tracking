@@ -256,7 +256,7 @@ function AutocompleteSearch() {
       {isOpen && (
         <div
           id="autocomplete-results"
-          {...(!isZeroState ? { 'data-cnstrc-autosuggest': '' } : {})}
+          data-cnstrc-autosuggest
           className="absolute z-50 w-[600px] right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-[400px] overflow-y-auto"
           role="listbox"
         >
@@ -297,7 +297,6 @@ function AutocompleteSearch() {
                           isHighlighted ? 'bg-blue-100' : 'hover:bg-gray-100'
                         }`}
                         onClick={() => handleItemSelect({ ...item, section: 'Search Suggestions' })}
-                        onMouseEnter={() => setHighlightedIndex(itemIndex)}
                       >
                         <span className="text-gray-800">{item.value}</span>
                       </li>
@@ -347,7 +346,6 @@ function AutocompleteSearch() {
                           isHighlighted ? 'bg-blue-100' : 'hover:bg-gray-100'
                         }`}
                         onClick={() => handleItemSelect({ ...item, section: 'Products' })}
-                        onMouseEnter={() => setHighlightedIndex(itemIndex)}
                       >
                         {item.data?.image_url && (
                           <img
