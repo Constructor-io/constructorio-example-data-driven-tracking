@@ -120,6 +120,21 @@ Buttons declare the conversion they represent.
 
 The app ships a `CnstrcHighlighter` overlay (`src/components/CnstrcHighlighter.jsx`) that scans the live DOM for every `data-cnstrc-*` attribute and draws labeled highlight boxes over the matching elements. Toggle it while browsing to **visually confirm** which containers, items, and actions are being tracked and how they nest. It is a debugging aid for this example, not part of a Constructor integration.
 
+## The tracking events panel (developer aid)
+
+The overlay shows where the attributes are; the **Tracking Events** panel shows what the beacon actually sent. Toggle it with the button above the overlay toggle. Each row is one behavioral event with its delivery status, its params, a check of the fields that event type needs, and a flag when a load event fires more than once on the same page view.
+
+Browse and Search expose tracking attributes only after the current request succeeds, including genuine zero-result responses. Loading and API errors do not announce zero results.
+
+Enable **Group identical loads and mute duplicate warnings** to combine successful Search/Browse load events with matching results on the same page view. The preference is saved locally; individual requests remain in the expanded row and **Copy** always exports every captured event.
+
+It has two parts:
+
+- `public/cio-event-recorder.js` is a small plain script loaded in `<head>` **before** the beacon tag, so it can hook `fetch` / `XMLHttpRequest` / `sendBeacon` before the beacon sends anything. It only records.
+- `src/components/EventTracker/` renders the panel, lazy loaded on first open. Parsing and field checks live in `src/utils/cioEvents.js`.
+
+Like the overlay, it is not part of a Constructor integration. Leave both out when copying this example.
+
 ## Getting started
 
 Install dependencies via `npm`:
