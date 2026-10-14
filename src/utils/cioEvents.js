@@ -297,26 +297,28 @@ export function buildEvents(rawEvents) {
 }
 
 export function groupRepeatedLoads(events) {
-  const groups = new Map();
-  const rows = [];
-  events.forEach((event) => {
-    const canGroup = ['search_result_load', 'browse_result_load'].includes(event.action)
+  const seen = new Set();
+  const rows = events.filter((event) => {
+    const isResultLoad = ['search_result_load', 'browse_result_load'].includes(event.action);
+    const hasResultId = fieldValue(event.params, 'result_id') !== undefined;
+    // Known beacon issue: stale SPA waiters send provisional zeros or repeat settled results.
+    // This demo gives confirmed results an ID, including real zero-result responses.
+    if (isResultLoad && event.status !== 'error' && !event.missing.length && !hasResultId
+      && Number(fieldValue(event.params, 'num_results')) === 0) return false;
+
+    const canGroup = isResultLoad
       && event.status === 'ok' && !event.missing.length
-      && event.pageView != null && fieldValue(event.params, 'result_id') !== undefined;
+      && event.pageView != null && hasResultId;
     const key = canGroup && JSON.stringify([
       event.pageView, event.pageUrl, event.action, event.endpoint,
       event.params.key, event.params.i, event.params.s, event.params.ui,
       eventParams(event).sort(([a], [b]) => a.localeCompare(b)),
     ]);
-    if (key && groups.has(key)) {
-      groups.get(key).deliveries.push(event);
-    } else {
-      const row = { ...event, deliveries: [event] };
-      rows.push(row);
-      if (key) groups.set(key, row);
-    }
+    if (key && seen.has(key)) return false;
+    if (key) seen.add(key);
+    return true;
   });
-  // Only the grouped view discounts repeats; captured events stay untouched.
+  // Captured requests remain untouched for the JSON export.
   return annotateEvents(rows);
 }
 

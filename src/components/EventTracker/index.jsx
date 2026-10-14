@@ -1,8 +1,9 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useMemo, useState } from 'react';
+import { buildEvents, groupRepeatedLoads } from '../../utils/cioEvents';
 import useRecordedEvents from './useRecordedEvents';
 
-// The panel (and the event parsing it needs) only loads once someone opens it.
+// The panel only loads once someone opens it.
 const EventTrackerPanel = lazy(() => import('./EventTrackerPanel'));
 
 // CnstrcHighlighter skips DOM mutations inside this id, so a new event row
@@ -21,7 +22,8 @@ function readOpen() {
 
 function EventTracker() {
   const [open, setOpen] = useState(readOpen);
-  const events = useRecordedEvents();
+  const rawEvents = useRecordedEvents();
+  const events = useMemo(() => groupRepeatedLoads(buildEvents(rawEvents)), [rawEvents]);
 
   const setAndStore = (value) => {
     setOpen(value);

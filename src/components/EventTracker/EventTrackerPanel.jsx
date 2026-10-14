@@ -1,5 +1,5 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   buildEvents,
   CLIENT_FIELDS,
@@ -17,7 +17,6 @@ import useRecordedEvents, { clearRecordedEvents, isRecorderLoaded } from './useR
 // the data attributes that produced them read as one tool.
 const MAX_VALUE_LENGTH = 160;
 const LABEL_SHADOW = 'shadow-[0_2px_8px_rgba(0,0,0,0.12)]';
-const GROUP_LOADS_KEY = 'cnstrc-group-repeated-loads';
 const PARAM_DOCS_URL = 'https://docs.constructor.com/docs/integrating-with-constructor-direct-api-integration-required-parameters';
 const PARAM_ANCHORS = {
   i: 'is---mandatory',
@@ -176,11 +175,6 @@ function EventRow({ event, expanded, onToggle }) {
             ▶
           </span>
           <span className="text-xs font-medium text-stone-800 tracking-wide">{event.label}</span>
-          {event.deliveries?.length > 1 && (
-            <span className="text-[10px] text-stone-500 whitespace-nowrap" title="Identical loads grouped; duplicate warning muted">
-              {event.deliveries.length} sends
-            </span>
-          )}
           {event.missing.length > 0 && (
             <Tag title={`Missing required: ${event.missing.join(', ')}`}>missing field</Tag>
           )}
@@ -209,20 +203,6 @@ function EventRow({ event, expanded, onToggle }) {
           )}
 
           <FieldCheck event={event} />
-
-          {event.deliveries?.length > 1 && (
-            <>
-              <SectionTitle>Captured requests · duplicate warning muted</SectionTitle>
-              {event.deliveries.map((delivery) => (
-                <details key={delivery.id} className="mt-1 text-[11px] text-stone-600">
-                  <summary className="cursor-pointer">#{delivery.id} · {formatTime(delivery.ts)} · <Status event={delivery} /></summary>
-                  <pre className="mt-1 whitespace-pre-wrap break-all">{JSON.stringify({
-                    method: delivery.method, url: delivery.url, params: delivery.params,
-                  }, null, 2)}</pre>
-                </details>
-              ))}
-            </>
-          )}
 
           {event.overfired && (
             <Warning>
@@ -281,22 +261,7 @@ function EventTrackerPanel({ onClose }) {
   const [filter, setFilter] = useState('all');
   const [expanded, setExpanded] = useState(() => new Set());
   const [copied, setCopied] = useState(false);
-  const [groupLoads, setGroupLoads] = useState(() => {
-    try {
-      return localStorage.getItem(GROUP_LOADS_KEY) === 'true';
-    } catch (e) {
-      return false;
-    }
-  });
-  useEffect(() => {
-    try {
-      localStorage.setItem(GROUP_LOADS_KEY, String(groupLoads));
-    } catch (e) {
-      // Keep the toggle usable when storage is blocked.
-    }
-  }, [groupLoads]);
-
-  const rows = useMemo(() => (groupLoads ? groupRepeatedLoads(events) : events), [events, groupLoads]);
+  const rows = useMemo(() => groupRepeatedLoads(events), [events]);
   const flagged = rows.filter(isFlagged);
   const visible = (filter === 'flagged' ? flagged : rows).slice().reverse();
 
@@ -381,13 +346,9 @@ function EventTrackerPanel({ onClose }) {
       </header>
 
       <div className="flex gap-2 px-4 py-2 border-b border-gray-100">
-        {chip('all', 'All', events.length)}
+        {chip('all', 'All', rows.length)}
         {chip('flagged', 'Issues', flagged.length)}
       </div>
-      <label className="flex items-center gap-2 px-4 py-2 text-xs text-stone-500 border-b border-gray-100">
-        <input type="checkbox" checked={groupLoads} onChange={(e) => setGroupLoads(e.target.checked)} />
-        Group identical loads and mute duplicate warnings
-      </label>
 
       <div className="flex-1 overflow-y-auto bg-gray-50 p-3">
         {visible.length ? (

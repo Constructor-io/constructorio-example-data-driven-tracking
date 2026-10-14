@@ -21,11 +21,11 @@ describe('groupRepeatedLoads', () => {
     ...overrides,
   });
 
-  it('groups matching loads while retaining every original request', () => {
+  it('shows matching loads once without changing the captured events', () => {
     const events = buildEvents([load(1), load(2)]);
     const grouped = groupRepeatedLoads(events);
     expect(grouped).toHaveLength(1);
-    expect(grouped[0].deliveries).toEqual(events);
+    expect(events).toHaveLength(2);
     expect(isFlagged(grouped[0])).toBe(false);
     expect(events[1].overfired).toBe(true);
   });
@@ -42,15 +42,26 @@ describe('groupRepeatedLoads', () => {
     expect(groupRepeatedLoads(buildEvents([load(1), load(2, params, overrides)]))).toHaveLength(2);
   });
 
-  it('keeps unidentified zeros and missing required fields visible', () => {
+  it('hides provisional zeros but preserves confirmed empty results and errors', () => {
     const events = buildEvents([
       load(1, { result_id: '', result_count: 0 }),
-      load(2, { result_id: '', result_count: 0 }),
+      load(2, { result_count: 0 }),
       load(3, { filter_value: '' }),
-      load(4, { filter_value: '' }),
+      load(4, { result_id: '', result_count: 0 }, { status: 'error', httpStatus: 500 }),
     ]);
-    expect(groupRepeatedLoads(events)).toHaveLength(4);
-    expect(groupRepeatedLoads(events).filter(isFlagged)).toHaveLength(3);
+    const visible = groupRepeatedLoads(events);
+    expect(visible.map((event) => event.id)).toEqual([2, 3, 4]);
+    expect(visible[0].params.result_count).toBe(0);
+    expect(visible.filter(isFlagged)).toHaveLength(2);
+  });
+
+  it('shows only the confirmed result after a provisional zero', () => {
+    const visible = groupRepeatedLoads(buildEvents([
+      load(1, { result_id: '', result_count: 0 }), load(2), load(3),
+    ]));
+    expect(visible).toHaveLength(1);
+    expect(visible[0].params.result_count).toBe(358);
+    expect(isFlagged(visible[0])).toBe(false);
   });
 });
 

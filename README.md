@@ -126,7 +126,7 @@ The overlay shows where the attributes are; the **Tracking Events** panel shows 
 
 Browse and Search expose tracking attributes only after the current request succeeds, including genuine zero-result responses. Loading and API errors do not announce zero results.
 
-Enable **Group identical loads and mute duplicate warnings** to combine successful Search/Browse load events with matching results on the same page view. The preference is saved locally; individual requests remain in the expanded row and **Copy** always exports every captured event.
+The panel automatically hides provisional zero-result loads without a result ID and shows identical successful Search/Browse loads once per page view. This handles a known beacon issue with stale SPA waiters. Confirmed empty results and request failures stay visible; **Copy** exports every captured request for debugging.
 
 It has two parts:
 
