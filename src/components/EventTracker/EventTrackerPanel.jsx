@@ -18,6 +18,34 @@ import useRecordedEvents, { clearRecordedEvents, isRecorderLoaded } from './useR
 const MAX_VALUE_LENGTH = 160;
 const LABEL_SHADOW = 'shadow-[0_2px_8px_rgba(0,0,0,0.12)]';
 const GROUP_LOADS_KEY = 'cnstrc-group-repeated-loads';
+const PARAM_DOCS_URL = 'https://docs.constructor.com/docs/integrating-with-constructor-direct-api-integration-required-parameters';
+const PARAM_ANCHORS = {
+  i: 'is---mandatory',
+  client_id: 'is---mandatory',
+  s: 'is---mandatory',
+  session_id: 'is---mandatory',
+  ui: 'ui---mandatory-for-logged-in-users',
+  user_id: 'ui---mandatory-for-logged-in-users',
+  c: 'c',
+  _dt: '_dt',
+  origin_referrer: 'origin_referrer',
+};
+
+function ParameterName({ name, children = name }) {
+  const anchor = PARAM_ANCHORS[name];
+  if (typeof anchor !== 'string') return children;
+  return (
+    <a
+      href={`${PARAM_DOCS_URL}#${anchor}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`Constructor documentation: ${children} (opens in a new tab)`}
+      className="underline decoration-dotted underline-offset-2 hover:text-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+    >
+      {children}
+    </a>
+  );
+}
 
 function formatValue(value) {
   return typeof value === 'object' ? JSON.stringify(value) : String(value);
@@ -72,10 +100,10 @@ function AttrLine({ name, value, note }) {
   const full = formatValue(value);
   return (
     <div className="font-mono text-[11px] leading-4 text-[#1a1a1a] break-all" title={full.length > MAX_VALUE_LENGTH ? full : undefined}>
-      {name}
+      <ParameterName name={name} />
       <span className="text-stone-400">=</span>
       {`'${clip(full)}'`}
-      {note && <span className="ml-2 text-stone-400">{note}</span>}
+      {note && <span className="ml-2 text-stone-400"><ParameterName name={name}>{note}</ParameterName></span>}
     </div>
   );
 }
