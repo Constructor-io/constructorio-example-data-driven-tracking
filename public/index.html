@@ -28,11 +28,31 @@
     <script>
       window.cnstrc = window.cnstrc || {};
       window.cnstrc.indexKey = "key_x6UnCVRZaJgIHFQD"; // Tiku's Threads
+
+      // Tracking mode: `?tracking=events` loads the local event-driven beacon (hackathon MVP),
+      // `?tracking=attributes` (default) loads the data-driven attribute beacon. The choice sticks
+      // for the browser session; only one beacon is ever loaded.
+      (function () {
+        var MODE_KEY = 'cnstrc-tracking-mode';
+        var match = /[?&]tracking=(events|attributes)\b/.exec(window.location.search + window.location.hash);
+        var mode;
+
+        try {
+          if (match) sessionStorage.setItem(MODE_KEY, match[1]);
+          mode = sessionStorage.getItem(MODE_KEY);
+        } catch (e) {
+          mode = match && match[1];
+        }
+
+        window.cnstrc.trackingMode = mode === 'events' ? 'events' : 'attributes';
+
+        var beacon = document.createElement('script');
+        beacon.src = window.cnstrc.trackingMode === 'events'
+          ? '%REACT_APP_EDB_BEACON_URL%'
+          : 'https://cnstrc.com/js/cust/tis-threads_62j26k.js';
+        document.head.appendChild(beacon);
+      })();
     </script>
-    <script
-      defer
-      src="https://cnstrc.com/js/cust/tis-threads_62j26k.js"
-    ></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
