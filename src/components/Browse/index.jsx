@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { FiltersContext } from '../../Layout';
 import { fetchBrowseReults } from '../../utils';
 import { pushCnstrcEvent, toEventItem } from '../../utils/cnstrcEvents';
+import { TrackingProvider } from '../../context/TrackingContext';
 import { loadStatuses } from '../../utils/constants';
 import Results from '../Results';
 
@@ -22,7 +23,7 @@ function Browse() {
 
   useEffect(() => {
     // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
-    // the current load pushes a tracking event
+    // the current load sets state and pushes a tracking event
     let isCurrent = true;
 
     const fetchSearchResultsFromAPI = async () => {
@@ -33,6 +34,8 @@ function Browse() {
         const filterValue = browseGroup?.group_id || rootBrowseGroupId;
         const filterName = 'group_id';
         const response = await fetchBrowseReults(filterName, filterValue);
+
+        if (!isCurrent) return;
 
         setLoadStatus(loadStatuses.LOADING);
         setItems(response?.results);
@@ -49,7 +52,7 @@ function Browse() {
         setLoadStatus(loadStatuses.SUCCESS);
 
         // rootBrowseGroupId starts as [] until the groups load; the effect re-runs once it resolves
-        if (isCurrent && filterValue && !Array.isArray(filterValue)) {
+        if (filterValue && !Array.isArray(filterValue)) {
           pushCnstrcEvent('browse_results_loaded', {
             filter_name: filterName,
             filter_value: String(filterValue),
@@ -76,19 +79,28 @@ function Browse() {
   const filterValue = browseGroup?.group_id || rootBrowseGroupId;
 
   return (
-    <Results
-      items={items}
-      loadStatus={loadStatus}
-      totalResults={totalResults}
-      error={error}
-      dataAttributes={{
-        'data-cnstrc-browse': '',
-        'data-cnstrc-result-id': resultId,
-        'data-cnstrc-result-page': 1,
-        'data-cnstrc-filter-name': filterName,
-        'data-cnstrc-filter-value': filterValue,
+    <TrackingProvider
+      value={{
+        type: 'browse',
+        filter_name: filterName,
+        filter_value: String(filterValue),
+        result_id: resultId,
       }}
-    />
+    >
+      <Results
+        items={items}
+        loadStatus={loadStatus}
+        totalResults={totalResults}
+        error={error}
+        dataAttributes={{
+          'data-cnstrc-browse': '',
+          'data-cnstrc-result-id': resultId,
+          'data-cnstrc-result-page': 1,
+          'data-cnstrc-filter-name': filterName,
+          'data-cnstrc-filter-value': filterValue,
+        }}
+      />
+    </TrackingProvider>
   );
 }
 

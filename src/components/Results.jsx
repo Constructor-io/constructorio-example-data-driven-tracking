@@ -45,10 +45,11 @@ function Results(props) {
       >
         {
           items.map(
-            (item) => (
+            (item, index) => (
               <ProductCard
                 key={ item.data.id }
                 product={ item }
+                position={ index + 1 }
                 onProductClick={ (product) => {
                   setCurrentProduct(product);
                   openModal();

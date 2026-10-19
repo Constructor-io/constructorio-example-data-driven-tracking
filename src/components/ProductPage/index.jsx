@@ -24,7 +24,7 @@ function ProductPage() {
 
   useEffect(() => {
     // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
-    // the current load pushes a tracking event
+    // the current load sets state and pushes a tracking event
     let isCurrent = true;
 
     const fetchProduct = async () => {
@@ -35,11 +35,13 @@ function ProductPage() {
         ]);
         const productData = response?.response?.results?.[0];
 
+        if (!isCurrent) return;
+
         if (productData) {
           setProduct(productData);
           setVariations(productData.variations || []);
           setLoadStatus(loadStatuses.SUCCESS);
-          if (isCurrent) pushCnstrcEvent('product_detail_loaded', toEventItem(productData));
+          pushCnstrcEvent('product_detail_loaded', toEventItem(productData));
         } else {
           setLoadStatus(loadStatuses.FAILED);
         }
@@ -116,6 +118,16 @@ function ProductPage() {
   const price = product?.data?.price;
   const hasDiscount = fullPrice && fullPrice > price;
   const displayPrice = price;
+
+  // No term is passed: the beacon attributes the conversion to the stored search term
+  const pushProductConversion = (type) => {
+    pushCnstrcEvent('conversion', {
+      ...toEventItem(product),
+      variation_id: activeVariationId,
+      type,
+      revenue: displayPrice,
+    });
+  };
 
   if (loadStatus === loadStatuses.LOADING) {
     return (
@@ -277,6 +289,7 @@ function ProductPage() {
               data-cnstrc-btn="add_to_cart"
               onClick={() => {
                 addToCart(product);
+                pushProductConversion('add_to_cart');
                 setAddedToCart(true);
                 setTimeout(() => setAddedToCart(false), 2000);
               }}
@@ -297,6 +310,7 @@ function ProductPage() {
                   removeFromWishlist(product.data?.id);
                 } else {
                   addToWishlist(product);
+                  pushProductConversion('add_to_wishlist');
                 }
               }}
               className={`w-full font-semibold py-4 px-6 rounded-lg border-2 flex items-center justify-center gap-2 ${
