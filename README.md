@@ -136,6 +136,41 @@ npm run start
 
 When running, the application is available at http://localhost:3000/.
 
+## Running the event-mode demo locally
+
+> Hackathon MVP (branch `hackathon-26-event-driven-beacon-mvp`). Instead of `data-cnstrc-*` attributes, the app pushes tracking events and a local event-driven beacon sends them. The default (attribute) mode is unchanged.
+
+In event mode, components push `{ event, version: 1, data }` onto `window.cnstrc.events` (see `src/utils/cnstrcEvents.js`). The beacon validates each event, then sends it through the Constructor tracker.
+
+1. In [`autocomplete-ui`](https://github.com/Constructor-io/autocomplete-ui), check out the same branch. Build and serve the beacon in two terminals:
+
+   ```bash
+   WATCH_FILE=hackathon-edb npx webpack --watch --config webpack-dev-watch.js
+   ```
+
+   ```bash
+   npm run server
+   ```
+
+2. Open https://localhost:8080/js/cust/hackathon-edb.js once and trust the self-signed certificate. Without this step the browser blocks the beacon and event mode tracks nothing.
+3. Start this app with `npm run start`.
+4. Open http://localhost:3000/?tracking=events&cnstrc_debug=1. The mode sticks for the browser session. Switch back with `?tracking=attributes`.
+5. Use the **Send a broken event** button (bottom left, event mode only) to show validation. The console logs the rejection reason and no request is sent.
+
+The beacon URL comes from `REACT_APP_EDB_BEACON_URL` in `.env`.
+
+| Event | Pushed from | Required `data` |
+| --- | --- | --- |
+| `search_results_loaded` | `Search/Search.jsx` | `term`, `num_results`, `items[].item_id` |
+| `browse_results_loaded` | `Browse/index.jsx` | `filter_name`, `filter_value`, `num_results`, `items[].item_id` |
+| `search_result_click` | `ProductCard.jsx` | `term`, `item_id` |
+| `browse_result_click` | `ProductCard.jsx` | `filter_name`, `filter_value`, `item_id` |
+| `product_detail_loaded` | `ProductPage/index.jsx` | `item_id` |
+| `conversion` | `ProductCard.jsx`, `ProductPage/index.jsx` | `item_id`, `type` |
+| `purchase` | `OrderConfirmationPage/index.jsx` | `order_id`, `items[].item_id` |
+
+Conversions don't pass a search term. The beacon remembers the last search, the same way attribute mode does.
+
 ## Available commands
 
 ```bash
