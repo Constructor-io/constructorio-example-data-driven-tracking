@@ -1,6 +1,7 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { pushPurchaseOnce } from '../../utils/cnstrcEvents';
 
 function OrderConfirmationPage() {
   const location = useLocation();
@@ -22,6 +23,17 @@ function OrderConfirmationPage() {
         order_id: orderData.orderId,
         revenue: orderData.revenue,
       };
+
+      // Event mode: deduped by order id since this effect re-runs on refresh/back and in StrictMode
+      pushPurchaseOnce({
+        order_id: orderData.orderId,
+        revenue: orderData.revenue,
+        items: orderData.items.map(({ item_id, variation_id, count }) => ({
+          item_id,
+          variation_id,
+          quantity: count,
+        })),
+      });
 
       // Capture the full cnstrc object for display
       setCnstrcObject({ ...window.cnstrc });

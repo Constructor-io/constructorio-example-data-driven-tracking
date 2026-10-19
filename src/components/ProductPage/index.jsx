@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import cioClient from '../../app/cioClient';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import { pushCnstrcEvent, toEventItem } from '../../utils/cnstrcEvents';
 import { loadStatuses } from '../../utils/constants';
 import Loader from '../Loader';
 import Recommendations from '../Recommendations';
@@ -22,6 +23,10 @@ function ProductPage() {
   const [selectedOptions, setSelectedOptions] = useState({});
 
   useEffect(() => {
+    // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
+    // the current load pushes a tracking event
+    let isCurrent = true;
+
     const fetchProduct = async () => {
       setLoadStatus(loadStatuses.LOADING);
       try {
@@ -34,6 +39,7 @@ function ProductPage() {
           setProduct(productData);
           setVariations(productData.variations || []);
           setLoadStatus(loadStatuses.SUCCESS);
+          if (isCurrent) pushCnstrcEvent('product_detail_loaded', toEventItem(productData));
         } else {
           setLoadStatus(loadStatuses.FAILED);
         }
@@ -45,6 +51,10 @@ function ProductPage() {
     if (itemId) {
       fetchProduct();
     }
+
+    return () => {
+      isCurrent = false;
+    };
   }, [itemId]);
 
   const variationOptions = useMemo(() => {

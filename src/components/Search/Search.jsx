@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { FiltersContext } from '../../Layout';
 import { fetchSearchResults, loadMoreSearchResults } from '../../utils';
+import { pushCnstrcEvent, toEventItem } from '../../utils/cnstrcEvents';
 import { loadStatuses } from '../../utils/constants';
 import Loader from '../Loader';
 import Results from '../Results';
@@ -20,6 +21,10 @@ function Search() {
   const [error, setError] = useState();
 
   useEffect(() => {
+    // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
+    // the current load pushes a tracking event
+    let isCurrent = true;
+
     const fetchSearchResultsFromAPI = async () => {
       setLoadStatus(loadStatuses.LOADING);
 
@@ -39,6 +44,15 @@ function Search() {
         setTotalResults(response.total_num_results);
         setResultId(response.result_id || '');
         setLoadStatus(loadStatuses.SUCCESS);
+        if (isCurrent) {
+          pushCnstrcEvent('search_results_loaded', {
+            term: searchTerm,
+            num_results: response.total_num_results,
+            result_id: response.result_id,
+            result_page: 1,
+            items: response.results.map(toEventItem),
+          });
+        }
       } catch (e) {
         setLoadStatus(loadStatuses.FAILED);
         setError(e);
@@ -47,6 +61,10 @@ function Search() {
 
     setPage(1);
     fetchSearchResultsFromAPI();
+
+    return () => {
+      isCurrent = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 

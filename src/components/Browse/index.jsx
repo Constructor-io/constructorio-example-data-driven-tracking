@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FiltersContext } from '../../Layout';
 import { fetchBrowseReults } from '../../utils';
+import { pushCnstrcEvent, toEventItem } from '../../utils/cnstrcEvents';
 import { loadStatuses } from '../../utils/constants';
 import Results from '../Results';
 
@@ -20,6 +21,10 @@ function Browse() {
   const [error, setError] = useState();
 
   useEffect(() => {
+    // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
+    // the current load pushes a tracking event
+    let isCurrent = true;
+
     const fetchSearchResultsFromAPI = async () => {
       setLoadStatus(loadStatuses.LOADING);
 
@@ -42,6 +47,17 @@ function Browse() {
         setTotalResults(response.total_num_results);
         setResultId(response.result_id || '');
         setLoadStatus(loadStatuses.SUCCESS);
+
+        // rootBrowseGroupId starts as [] until the groups load; the effect re-runs once it resolves
+        if (isCurrent && filterValue && !Array.isArray(filterValue)) {
+          pushCnstrcEvent('browse_results_loaded', {
+            filter_name: filterName,
+            filter_value: String(filterValue),
+            num_results: response.total_num_results,
+            result_id: response.result_id,
+            items: (response.results || []).map(toEventItem),
+          });
+        }
       } catch (e) {
         setLoadStatus(loadStatuses.FAILED);
         setError(e);
@@ -49,6 +65,10 @@ function Browse() {
     };
 
     fetchSearchResultsFromAPI();
+
+    return () => {
+      isCurrent = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location, rootBrowseGroupId]);
 
