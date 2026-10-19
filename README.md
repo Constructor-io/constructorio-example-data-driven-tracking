@@ -165,7 +165,7 @@ The beacon URL comes from `REACT_APP_EDB_BEACON_URL` in `.env`.
 | `browse_results_loaded` | `Browse/index.jsx` | `filter_name`, `filter_value`, `num_results`, `items[].item_id` |
 | `search_result_click` | `ProductCard.jsx` | `term`, `item_id` |
 | `browse_result_click` | `ProductCard.jsx` | `filter_name`, `filter_value`, `item_id` |
-| `product_detail_loaded` | `ProductPage/index.jsx` | `item_id` |
+| `item_detail_load` | `ProductPage/index.jsx` | `item_id` |
 | `conversion` | `ProductCard.jsx`, `ProductPage/index.jsx` | `item_id`, `type` |
 | `purchase` | `OrderConfirmationPage/index.jsx` | `order_id`, `items[].item_id` |
 

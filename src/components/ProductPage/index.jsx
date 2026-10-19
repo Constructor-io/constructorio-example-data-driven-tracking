@@ -41,7 +41,7 @@ function ProductPage() {
           setProduct(productData);
           setVariations(productData.variations || []);
           setLoadStatus(loadStatuses.SUCCESS);
-          pushCnstrcEvent('product_detail_loaded', toEventItem(productData));
+          pushCnstrcEvent('item_detail_load', toEventItem(productData));
         } else {
           setLoadStatus(loadStatuses.FAILED);
         }
