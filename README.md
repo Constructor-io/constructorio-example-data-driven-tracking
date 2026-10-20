@@ -154,8 +154,12 @@ In event mode, components push `{ event, version: 1, data }` onto `window.cnstrc
 
 2. Open https://localhost:8080/js/cust/hackathon-edb.js once and trust the self-signed certificate. Without this step the browser blocks the beacon and event mode tracks nothing.
 3. Start this app with `npm run start`.
-4. Open http://localhost:3000/?tracking=events&cnstrc_debug=1. The mode sticks for the browser session. Switch back with `?tracking=attributes`.
-5. Use the **Send a broken event** button (bottom left, event mode only) to show validation. The console logs the rejection reason and no request is sent.
+4. Open http://localhost:3000/?tracking=events. The mode sticks for the browser session. Switch back with `?tracking=attributes`.
+5. Use the buttons in the bottom left (event mode only) to show the beacon's two kinds of feedback:
+   - **Send a broken event** pushes a click with no `item_id`. The console logs the rejection reason, and no request is sent.
+   - **Send an unknown item** pushes a product view for an item that isn't in the index. The event is sent, then the catalog check warns `item_id "DOES-NOT-EXIST-123" not found in the index`.
+
+Console feedback and the catalog check only run when the beacon is built with `devMode: true` (in `autocomplete-ui/src/cust/hackathon-edb.js`). Nothing on the page can turn them on. The catalog check looks up each sent event's item IDs, variation IDs and browse groups in the index, and never blocks sending. Keep `devMode` off for live customers: the console stays silent and shoppers' browsers make no extra browse requests.
 
 The beacon URL comes from `REACT_APP_EDB_BEACON_URL` in `.env`.
 
