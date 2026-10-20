@@ -1,27 +1,64 @@
 /* eslint-disable react/react-in-jsx-scope */
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
+import { TrackingContext } from "../context/TrackingContext";
+import { pushCnstrcEvent, toEventItem } from "../utils/cnstrcEvents";
 
-function ProductCard({ product }) {
+function ProductCard({ product, position }) {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const [addedToCart, setAddedToCart] = useState(false);
   const isRecommendation = !!product.strategy?.id;
+  // Recommendation cards can render inside a search/browse context (the Results modal), so they're
+  // excluded explicitly
+  const trackingContext = useContext(TrackingContext);
+  const resultContext = isRecommendation ? null : trackingContext;
   const imageTagClassesLoading =
     "w-full h-[225px] object-cover transition-opacity opacity-0 ml-auto mr-auto";
   const imageTagClassesLoaded =
     "w-full h-[225px] object-cover transition-opacity opacity-100 ml-auto mr-auto";
 
+  const price = product.data?.sale_price || product.data?.price;
+
   const handleClick = () => {
+    if (resultContext) {
+      const clickData = {
+        ...toEventItem(product),
+        result_id: resultContext.result_id || undefined,
+        result_position_on_page: position,
+      };
+
+      if (resultContext.type === "search") {
+        pushCnstrcEvent("search_result_click", { term: resultContext.term, ...clickData });
+      } else {
+        pushCnstrcEvent("browse_result_click", {
+          filter_name: resultContext.filter_name,
+          filter_value: resultContext.filter_value,
+          ...clickData,
+        });
+      }
+    }
+
     navigate(`/product/${product.data.id}`);
+  };
+
+  // No term is passed: the beacon attributes the conversion to the stored search term
+  const pushConversion = (type) => {
+    pushCnstrcEvent("conversion", {
+      ...toEventItem(product),
+      type,
+      revenue: price,
+      result_id: resultContext?.result_id || undefined,
+    });
   };
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart(product);
+    pushConversion("add_to_cart");
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
   };
@@ -34,10 +71,9 @@ function ProductCard({ product }) {
       removeFromWishlist(product.data.id);
     } else {
       addToWishlist(product);
+      pushConversion("add_to_wishlist");
     }
   };
-
-  const price = product.data?.sale_price || product.data?.price;
 
   return (
     <div

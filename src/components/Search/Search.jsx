@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { FiltersContext } from '../../Layout';
 import { fetchSearchResults, loadMoreSearchResults } from '../../utils';
+import { pushCnstrcEvent, toEventItem } from '../../utils/cnstrcEvents';
+import { TrackingProvider } from '../../context/TrackingContext';
 import { loadStatuses } from '../../utils/constants';
 import Loader from '../Loader';
 import Results from '../Results';
@@ -20,11 +22,17 @@ function Search() {
   const [error, setError] = useState();
 
   useEffect(() => {
+    // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
+    // the current load sets state and pushes a tracking event
+    let isCurrent = true;
+
     const fetchSearchResultsFromAPI = async () => {
       setLoadStatus(loadStatuses.LOADING);
 
       try {
         const response = await fetchSearchResults();
+
+        if (!isCurrent) return;
 
         setLoadStatus(loadStatuses.LOADING);
         setItems(response.results);
@@ -39,6 +47,13 @@ function Search() {
         setTotalResults(response.total_num_results);
         setResultId(response.result_id || '');
         setLoadStatus(loadStatuses.SUCCESS);
+        pushCnstrcEvent('search_results_loaded', {
+          term: searchTerm,
+          num_results: response.total_num_results,
+          result_id: response.result_id,
+          result_page: 1,
+          items: response.results.map(toEventItem),
+        });
       } catch (e) {
         setLoadStatus(loadStatuses.FAILED);
         setError(e);
@@ -47,6 +62,10 @@ function Search() {
 
     setPage(1);
     fetchSearchResultsFromAPI();
+
+    return () => {
+      isCurrent = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
@@ -83,20 +102,22 @@ function Search() {
     <>
       {isLoading && <Loader />}
       {!isLoading && loadStatus === loadStatuses.SUCCESS && numItems >= 1 && (
-        <Results
-          items={items}
-          totalResults={totalResults}
-          page={page}
-          loadMoreStatus={loadMoreStatus}
-          loadMoreSearchResults={loadMoreSearchResultsAndSetState}
-          dataAttributes={{
-            'data-cnstrc-search': '',
-            'data-cnstrc-search-term': searchTerm,
-            'data-cnstrc-result-id': resultId,
-            'data-cnstrc-result-page': page,
-          }}
-          error={error}
-        />
+        <TrackingProvider value={{ type: 'search', term: searchTerm, result_id: resultId }}>
+          <Results
+            items={items}
+            totalResults={totalResults}
+            page={page}
+            loadMoreStatus={loadMoreStatus}
+            loadMoreSearchResults={loadMoreSearchResultsAndSetState}
+            dataAttributes={{
+              'data-cnstrc-search': '',
+              'data-cnstrc-search-term': searchTerm,
+              'data-cnstrc-result-id': resultId,
+              'data-cnstrc-result-page': page,
+            }}
+            error={error}
+          />
+        </TrackingProvider>
       )}
       {!isLoading && (loadStatus === loadStatuses.FAILED || numItems === 0) && (
         <div

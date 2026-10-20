@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { FiltersContext } from '../../Layout';
 import { fetchBrowseReults } from '../../utils';
+import { pushCnstrcEvent, toEventItem } from '../../utils/cnstrcEvents';
+import { TrackingProvider } from '../../context/TrackingContext';
 import { loadStatuses } from '../../utils/constants';
 import Results from '../Results';
 
@@ -20,6 +22,10 @@ function Browse() {
   const [error, setError] = useState();
 
   useEffect(() => {
+    // False once this effect is cleaned up (navigation, or StrictMode's dev double-mount), so only
+    // the current load sets state and pushes a tracking event
+    let isCurrent = true;
+
     const fetchSearchResultsFromAPI = async () => {
       setLoadStatus(loadStatuses.LOADING);
 
@@ -28,6 +34,8 @@ function Browse() {
         const filterValue = browseGroup?.group_id || rootBrowseGroupId;
         const filterName = 'group_id';
         const response = await fetchBrowseReults(filterName, filterValue);
+
+        if (!isCurrent) return;
 
         setLoadStatus(loadStatuses.LOADING);
         setItems(response?.results);
@@ -42,6 +50,17 @@ function Browse() {
         setTotalResults(response.total_num_results);
         setResultId(response.result_id || '');
         setLoadStatus(loadStatuses.SUCCESS);
+
+        // rootBrowseGroupId starts as [] until the groups load; the effect re-runs once it resolves
+        if (filterValue && !Array.isArray(filterValue)) {
+          pushCnstrcEvent('browse_results_loaded', {
+            filter_name: filterName,
+            filter_value: String(filterValue),
+            num_results: response.total_num_results,
+            result_id: response.result_id,
+            items: (response.results || []).map(toEventItem),
+          });
+        }
       } catch (e) {
         setLoadStatus(loadStatuses.FAILED);
         setError(e);
@@ -49,6 +68,10 @@ function Browse() {
     };
 
     fetchSearchResultsFromAPI();
+
+    return () => {
+      isCurrent = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location, rootBrowseGroupId]);
 
@@ -56,19 +79,28 @@ function Browse() {
   const filterValue = browseGroup?.group_id || rootBrowseGroupId;
 
   return (
-    <Results
-      items={items}
-      loadStatus={loadStatus}
-      totalResults={totalResults}
-      error={error}
-      dataAttributes={{
-        'data-cnstrc-browse': '',
-        'data-cnstrc-result-id': resultId,
-        'data-cnstrc-result-page': 1,
-        'data-cnstrc-filter-name': filterName,
-        'data-cnstrc-filter-value': filterValue,
+    <TrackingProvider
+      value={{
+        type: 'browse',
+        filter_name: filterName,
+        filter_value: String(filterValue),
+        result_id: resultId,
       }}
-    />
+    >
+      <Results
+        items={items}
+        loadStatus={loadStatus}
+        totalResults={totalResults}
+        error={error}
+        dataAttributes={{
+          'data-cnstrc-browse': '',
+          'data-cnstrc-result-id': resultId,
+          'data-cnstrc-result-page': 1,
+          'data-cnstrc-filter-name': filterName,
+          'data-cnstrc-filter-value': filterValue,
+        }}
+      />
+    </TrackingProvider>
   );
 }
 

@@ -10,6 +10,7 @@ import {
 import cioClient from './app/cioClient';
 import AutocompleteSearch from './components/AutocompleteSearch';
 import ConstructorLogo from './components/ConstructorLogo';
+import EventModeBadge from './components/EventModeBadge';
 import FacetFilters from './components/Filters/FacetFilters';
 import FiltersMobile from './components/Filters/FiltersMobile';
 import GroupFilters from './components/Filters/GroupFilters';
@@ -291,6 +292,7 @@ function Layout() {
         </div>
       </div>
       <Footer />
+      <EventModeBadge />
     </div>
   );
 }
