@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, createContext, useContext } from "react";
+import { EVENT_TRACKER_ROOT_ID } from "./EventTracker";
 
 const CONSTRUCTOR_FAVICON_URL = `${process.env.PUBLIC_URL || ""}/favicon.svg`;
 
@@ -608,6 +609,8 @@ function CnstrcHighlighter() {
           m.target.closest?.(`#${OVERLAY_CONTAINER_ID}`)
         )
           return false;
+        // The event tracker panel re-renders on every captured event.
+        if (m.target.closest?.(`#${EVENT_TRACKER_ROOT_ID}`)) return false;
         if (
           m.type === "attributes" &&
           m.attributeName &&
