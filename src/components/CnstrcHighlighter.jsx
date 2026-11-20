@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useRef, createContext, useCont
 const CONSTRUCTOR_FAVICON_URL = `${process.env.PUBLIC_URL || ""}/favicon.svg`;
 
 const OVERLAY_CONTAINER_ID = "cnstrc-highlight-container";
+const AUTOCOMPLETE_DROPDOWN = "#autocomplete-results";
 
 // Context so child components (e.g. CnstrcOverlayTag) can read the enabled state
 const HighlighterContext = createContext({ enabled: false });
@@ -263,7 +264,7 @@ function CnstrcHighlighter() {
         || element.hasAttribute("data-cnstrc-search-form")
         || element.hasAttribute("data-cnstrc-search-input")
         || element.hasAttribute("data-cnstrc-search-submit-btn")
-        || !!element.closest("[data-cnstrc-autosuggest]");
+        || !!element.closest(AUTOCOMPLETE_DROPDOWN);
       const boxZ = isAutocomplete ? "10050" : "9999";
       const labelZ = isAutocomplete ? "10051" : "10000";
 
@@ -444,7 +445,7 @@ function CnstrcHighlighter() {
     });
 
     // When autocomplete dropdown is open, only show autocomplete-related overlays
-    const autosuggestOpen = !!document.querySelector("[data-cnstrc-autosuggest]");
+    const autosuggestOpen = !!document.querySelector(AUTOCOMPLETE_DROPDOWN);
 
     // Phase 3: Create overlays — containers cycle through palette, items stay blue
     let containerColorIdx = 0;
@@ -454,7 +455,7 @@ function CnstrcHighlighter() {
         || el.hasAttribute("data-cnstrc-search-form")
         || el.hasAttribute("data-cnstrc-search-input")
         || el.hasAttribute("data-cnstrc-search-submit-btn")
-        || !!el.closest("[data-cnstrc-autosuggest]");
+        || !!el.closest(AUTOCOMPLETE_DROPDOWN);
       if (autosuggestOpen && !isAcContainer) return;
 
       const pal =
