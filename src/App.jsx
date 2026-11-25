@@ -4,6 +4,7 @@ import Browse from './components/Browse';
 import CartPage from './components/CartPage';
 import CheckoutPage from './components/CheckoutPage';
 import CnstrcHighlighter from './components/CnstrcHighlighter';
+import EventTracker from './components/EventTracker';
 import Home from './components/Home';
 import LoginInfo from './components/LoginInfo';
 import OrderConfirmationPage from './components/OrderConfirmationPage';
@@ -19,6 +20,7 @@ function App() {
     <WishlistProvider>
       <CartProvider>
         <CnstrcHighlighter />
+        <EventTracker />
         <div className="App p-5 max-w-lg sm:max-w-7xl mx-auto">
           <Routes>
             <Route path="*" element={<Layout />}>

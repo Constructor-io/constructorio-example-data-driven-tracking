@@ -29,6 +29,12 @@
       window.cnstrc = window.cnstrc || {};
       window.cnstrc.indexKey = "key_x6UnCVRZaJgIHFQD"; // Tiku's Threads
     </script>
+    <!--
+      Developer aid for the Tracking Events panel: records the beacon's events.
+      Must stay a blocking script above the beacon so it can hook fetch before
+      the beacon sends anything. Not part of a Constructor integration.
+    -->
+    <script src="%PUBLIC_URL%/cio-event-recorder.js"></script>
     <script
       defer
       src="https://cnstrc.com/js/cust/tis-threads_62j26k.js"
